@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.db import connection
+from django.contrib import messages
 
 
 # 🔒 SOLO ADMIN
@@ -34,6 +35,18 @@ def crear_usuario(request):
         password = request.POST.get('password')
         rol = request.POST.get('rol')
 
+        if not username or not email or not password or not rol:
+            messages.error(request, "Todos los campos son obligatorios.")
+            return redirect('crear_usuario')
+
+        if User.objects.filter(username=username).exists():
+            messages.error(request, "El nombre de usuario ya existe.")
+            return redirect('crear_usuario')
+
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "El correo ya está registrado.")
+            return redirect('crear_usuario')
+
         user = User.objects.create_user(
             username=username,
             email=email,
@@ -43,9 +56,10 @@ def crear_usuario(request):
         user.perfilusuario.rol = rol
         user.perfilusuario.save()
 
-        return redirect('dashboard')
+        messages.success(request, "Usuario creado correctamente.")
+        return redirect('crear_usuario')
 
-    return render(request, 'c_usuarios.html')
+    return render(request, 'c_usuario.html')
 
 
 # 🧪 TEST DB

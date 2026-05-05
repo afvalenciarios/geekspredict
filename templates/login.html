@@ -86,7 +86,11 @@
 
     <form method="POST">
         {% csrf_token %}
-
+        {% if form.errors %}
+            <p style="color:red; font-size:13px;">
+            Usuario o contraseña incorrectos.
+            </p>
+        {% endif %}
         <input type="text" name="username" placeholder="Acceso corporativo" required>
 
         <input type="password" name="password" placeholder="Contraseña" required>
