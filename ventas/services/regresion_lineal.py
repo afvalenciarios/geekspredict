@@ -1,19 +1,22 @@
 from sklearn.linear_model import LinearRegression
 import pandas as pd
 import mysql.connector
+import os
+from dotenv import load_dotenv
 import numpy as np
 
+load_dotenv()
 
 class RegresionLinealService:
 
     def entrenar_modelo(self):
 
         conexion = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="andresvalencia",
-            database="geekspredict_db"
-        )
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
+)
 
         query = """
         SELECT fecha, cantidad
