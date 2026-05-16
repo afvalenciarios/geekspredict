@@ -4,9 +4,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.db import connection
 from django.contrib import messages
+from django.http import HttpResponse
+from .services.regresion_lineal import RegresionLinealService
+from .services.modelos_predictivos import ModelosPredictivosService
+import mysql.connector
+import json
 
-
-# 🔒 SOLO ADMIN
 def solo_admin(view_func):
     def wrapper(request, *args, **kwargs):
         if request.user.perfilusuario.rol != 'ADMIN':
@@ -14,8 +17,6 @@ def solo_admin(view_func):
         return view_func(request, *args, **kwargs)
     return wrapper
 
-
-# 📊 DASHBOARD
 @login_required
 def dashboard(request):
     rol = request.user.perfilusuario.rol
@@ -24,8 +25,6 @@ def dashboard(request):
         'rol': rol
     })
 
-
-# 👤 CREAR USUARIO
 @login_required
 @solo_admin
 def crear_usuario(request):
@@ -70,3 +69,54 @@ def test_db(request):
         db = cursor.fetchone()
 
     return HttpResponse(f"Conectado a: {db}")
+
+
+def prueba_ml(request):
+
+    servicio = RegresionLinealService()
+    resultado = servicio.entrenar_modelo()
+    servicio_modelos = ModelosPredictivosService()
+    modelos = servicio_modelos.obtener_modelos()
+
+    prediccion = resultado["prediccion"]
+    meses = resultado["meses"]
+    ventas_mensuales = resultado["ventas_mensuales"]
+    mes_prediccion = resultado["mes_prediccion"]
+
+    conexion = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="andresvalencia",
+        database="geekspredict_db"
+    )
+
+    cursor = conexion.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM producto")
+    total_productos = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM venta")
+    total_ventas = cursor.fetchone()[0]
+
+    cursor.execute("""
+        SELECT categoria, SUM(cantidad) AS total
+        FROM venta
+        GROUP BY categoria
+        ORDER BY total DESC
+        LIMIT 1
+    """)
+
+    categoria_top = cursor.fetchone()
+
+    conexion.close()
+
+    return render(request, "prediccion.html", {
+        "prediccion": prediccion,
+        "modelos": modelos,
+        "total_productos": total_productos,
+        "total_ventas": total_ventas,
+        "categoria_top": categoria_top,
+        "meses": json.dumps(meses),
+        "ventas_mensuales": json.dumps(ventas_mensuales),
+        "mes_prediccion": mes_prediccion
+    })
