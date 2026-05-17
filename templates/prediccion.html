@@ -5,7 +5,6 @@
     <title>Predicción de Ventas</title>
 
     <style>
-
         body {
             font-family: Arial;
             background: #f4f6f9;
@@ -13,49 +12,44 @@
             padding: 0;
         }
 
-        .layout{
-            display:flex;
+        .layout {
+            display: flex;
         }
 
-        /* SIDEBAR */
-
-        .sidebar{
-            width:250px;
-            height:100vh;
-            background:#1f2937;
-            padding:30px 20px;
-            position:fixed;
-            left:0;
-            top:0;
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #1f2937;
+            padding: 30px 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
         }
 
-        .sidebar h2{
-            color:white;
-            margin-bottom:40px;
-            text-align:center;
+        .sidebar h2 {
+            color: white;
+            margin-bottom: 40px;
+            text-align: center;
         }
 
-        .sidebar a{
-            display:block;
-            color:#d1d5db;
-            text-decoration:none;
-            padding:15px;
-            border-radius:10px;
-            margin-bottom:10px;
-            transition:0.3s;
+        .sidebar a {
+            display: block;
+            color: #d1d5db;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
         }
 
-        .sidebar a:hover{
-            background:#374151;
-            color:white;
+        .sidebar a:hover {
+            background: #374151;
+            color: white;
         }
 
-        .sidebar .activo{
-            background:#2563eb;
-            color:white;
+        .sidebar .activo {
+            background: #2563eb;
+            color: white;
         }
-
-        /* CONTENIDO */
 
         .contenido {
             margin-left: 290px;
@@ -74,11 +68,9 @@
             margin-bottom: 40px;
         }
 
-        /* CARDS */
-
         .cards {
             display: grid;
-            grid-template-columns: repeat(2,1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 25px;
         }
 
@@ -100,8 +92,6 @@
             color: #2c3e50;
         }
 
-        /* GRAFICA */
-
         .grafica {
             margin-top: 40px;
             background: white;
@@ -112,42 +102,87 @@
 
         .grafica h2 {
             margin-bottom: 20px;
-            text-align:center;
+            text-align: center;
+        }
+
+        .acciones {
+            margin-top: 40px;
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .acciones button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .acciones button:hover {
+            background: #1d4ed8;
+        }
+
+        .panel-info {
+            margin-top: 25px;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .panel-info h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .oculto {
+            display: none;
+        }
+
+        .tabla-producto {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .tabla-producto th,
+        .tabla-producto td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .tabla-producto th {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .tabla-producto tfoot th {
+            background: #2563eb;
+            color: white;
         }
 
     </style>
-
 </head>
 
 <body>
 
 <div class="layout">
 
-    <!-- SIDEBAR -->
-
     <div class="sidebar">
-
         <h2>GeekPredict</h2>
 
-        <a href="/prueba-ml/" class="activo">
-            Regresión Lineal
-        </a>
-
-        <a href="/random-forest/">
-            Random Forest
-        </a>
-
-        <a href="/xgboost/">
-            XGBoost
-        </a>
-
-        <a href="/lstm/">
-            LSTM
-        </a>
-
+        <a href="/prueba-ml/" class="activo">Regresión Lineal</a>
+        <a href="/random-forest/">Random Forest</a>
+        <a href="/xgboost/">XGBoost</a>
+        <a href="/lstm/">LSTM</a>
     </div>
-
-    <!-- CONTENIDO -->
 
     <div class="contenido">
 
@@ -158,52 +193,115 @@
             <div class="cards">
 
                 <div class="card">
-                    <div class="titulo">
-                        Predicción estimada para {{ mes_prediccion }}
-                    </div>
-
-                    <div class="valor">
-                        {{ prediccion }}
-                    </div>
+                    <div class="titulo">Predicción estimada para {{ mes_prediccion }}</div>
+                    <div class="valor">{{ prediccion }}</div>
                 </div>
 
                 <div class="card">
                     <div class="titulo">Total productos</div>
-
-                    <div class="valor">
-                        {{ total_productos }}
-                    </div>
+                    <div class="valor">{{ total_productos }}</div>
                 </div>
 
                 <div class="card">
                     <div class="titulo">Total ventas</div>
-
-                    <div class="valor">
-                        {{ total_ventas }}
-                    </div>
+                    <div class="valor">{{ total_ventas }}</div>
                 </div>
 
                 <div class="card">
-                    <div class="titulo">
-                        Categoría más vendida
-                    </div>
-
-                    <div class="valor">
-                        {{ categoria_top.0 }}
-                    </div>
+                    <div class="titulo">Categoría más vendida</div>
+                    <div class="valor">{{ categoria_top.0 }}</div>
                 </div>
 
             </div>
 
-            <!-- GRAFICA -->
-
             <div class="grafica">
-
-                <h2>
-                    Tendencia mensual de ventas 2025
-                </h2>
-
+                <h2>Tendencia mensual de ventas 2025</h2>
                 <canvas id="graficaTendencia"></canvas>
+            </div>
+
+            <div class="acciones">
+                <button onclick="mostrarSeccion('metricas')">
+                    Evaluar modelo
+                </button>
+
+                <button onclick="mostrarSeccion('producto')">
+                    Producto más vendido
+                </button>
+
+                <button onclick="mostrarSeccion('stock')">
+                    Consultar stock sugerido
+                </button>
+            </div>
+
+            <div id="metricas" class="panel-info oculto">
+                <h2>Evaluación del modelo predictivo</h2>
+
+                <p>
+                    El MAE indica el error promedio en unidades entre las ventas reales y las ventas predichas.
+                    En este caso, el modelo presenta un error promedio de <strong>{{ mae }}</strong> unidades.
+                </p>
+
+                <p>
+                    El MAPE indica el porcentaje promedio de error del modelo.
+                    En este caso, el modelo presenta un error aproximado del <strong>{{ mape }}%</strong>.
+                </p>
+
+                <p>
+                    Según el resultado obtenido, el modelo tiene un desempeño aceptable para una primera
+                    aproximación predictiva dentro del sistema.
+                </p>
+            </div>
+
+            <div id="producto" class="panel-info oculto">
+
+                <h2>Producto más vendido</h2>
+
+                <p>
+                    Producto:
+                    <strong>{{ producto_top.0 }}</strong>
+                </p>
+
+                <table class="tabla-producto">
+                    <thead>
+                        <tr>
+                            <th>Mes</th>
+                            <th>Unidades vendidas</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for fila in ventas_producto_mes %}
+                        <tr>
+                            <td>{{ fila.0 }}</td>
+                            <td>{{ fila.1 }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                    <tfoot>
+                        <tr>
+                            <th>Total vendido</th>
+                            <th>{{ total_producto_top }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+            </div>
+
+            <div id="stock" class="panel-info oculto">
+
+                <h2>Consulta de stock sugerido</h2>
+
+                <p>
+                    Promedio mensual vendido:
+                    <strong>{{ promedio_mensual }}</strong> unidades
+                </p>
+
+                <p>
+                    Stock sugerido para el próximo mes:
+                </p>
+
+                <h1>{{ stock_sugerido }} unidades</h1>
 
             </div>
 
@@ -216,51 +314,42 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
     const meses = JSON.parse('{{ meses|escapejs }}');
-
     const ventasMensuales = JSON.parse('{{ ventas_mensuales|escapejs }}');
 
     const ctx = document.getElementById('graficaTendencia');
 
     new Chart(ctx, {
-
         type: 'line',
-
         data: {
-
             labels: meses,
-
             datasets: [{
-
                 label: 'Cantidad vendida por mes',
-
                 data: ventasMensuales,
-
                 borderWidth: 3,
-
                 tension: 0.3,
-
                 fill: false
-
             }]
         },
-
         options: {
-
             responsive: true,
-
             scales: {
-
                 y: {
-
                     beginAtZero: true
-
                 }
             }
         }
     });
+</script>
 
+<script>
+    function mostrarSeccion(id) {
+        document.getElementById('metricas').classList.add('oculto');
+        document.getElementById('producto').classList.add('oculto');
+        document.getElementById('stock').classList.add('oculto');
+
+        document.getElementById(id).classList.remove('oculto');
+    }
 </script>
 
 </body>

@@ -1,4 +1,5 @@
 from sklearn.linear_model import LinearRegression
+from .evaluacion_modelo import EvaluacionModeloService
 import pandas as pd
 import mysql.connector
 import os
@@ -34,7 +35,9 @@ class RegresionLinealService:
                 "prediccion": 0,
                 "meses": [],
                 "ventas_mensuales": [],
-                "mes_prediccion": "Sin datos"
+                "mes_prediccion": "Sin datos",
+                "mae": 0,
+                "mape": 0
             }
 
         datos["fecha"] = pd.to_datetime(datos["fecha"])
@@ -52,6 +55,17 @@ class RegresionLinealService:
 
         modelo = LinearRegression()
         modelo.fit(X, y)
+
+        # Predicciones sobre datos reales
+        y_pred = modelo.predict(X)
+
+        # Evaluación del modelo
+        evaluador = EvaluacionModeloService()
+
+        metricas = evaluador.calcular_metricas(y, y_pred)
+
+        mae = metricas["mae"]
+        mape = metricas["mape"]
 
         ultimo_mes = int(ventas_mensuales["mes"].max())
 
@@ -90,5 +104,7 @@ class RegresionLinealService:
             "prediccion": round(float(prediccion[0]), 2),
             "meses": labels,
             "ventas_mensuales": valores,
-            "mes_prediccion": nombres_meses[siguiente_mes_numero - 1]
+            "mes_prediccion": nombres_meses[siguiente_mes_numero - 1],
+            "mae": mae,
+            "mape": mape
         }

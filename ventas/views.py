@@ -9,6 +9,7 @@ from .services.regresion_lineal import RegresionLinealService
 from .services.modelos_predictivos import ModelosPredictivosService
 import mysql.connector
 import json
+import os
 
 def solo_admin(view_func):
     def wrapper(request, *args, **kwargs):
@@ -82,13 +83,22 @@ def prueba_ml(request):
     meses = resultado["meses"]
     ventas_mensuales = resultado["ventas_mensuales"]
     mes_prediccion = resultado["mes_prediccion"]
+    mae = resultado["mae"]
+    mape = resultado["mape"]
+    print("MAE:", mae)
+    print("MAPE:", mape)
+
+    print("ENTRÉ A PRUEBA ML")
+
+    servicio = RegresionLinealService()
+    resultado = servicio.entrenar_modelo()
 
     conexion = mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="andresvalencia",
-        database="geekspredict_db"
-    )
+        host=os.getenv("DB_HOST"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
+)
 
     cursor = conexion.cursor()
 
@@ -108,6 +118,32 @@ def prueba_ml(request):
 
     categoria_top = cursor.fetchone()
 
+    cursor.execute("""
+    SELECT producto, SUM(cantidad) AS total
+    FROM venta
+    GROUP BY producto
+    ORDER BY total DESC
+    LIMIT 1
+    """)
+
+    producto_top = cursor.fetchone()
+    promedio_mensual = round(producto_top[1] / 12)
+    stock_sugerido = promedio_mensual + 10
+
+    cursor.execute("""
+    SELECT 
+        MONTH(fecha) AS mes,
+        SUM(cantidad) AS total_vendido
+        FROM venta
+        WHERE producto = %s
+        AND YEAR(fecha) = 2025
+        GROUP BY MONTH(fecha)
+        ORDER BY MONTH(fecha)
+    """, (producto_top[0],))
+
+    ventas_producto_mes = cursor.fetchall()
+
+    total_producto_top = sum(fila[1] for fila in ventas_producto_mes)
     conexion.close()
 
     return render(request, "prediccion.html", {
@@ -118,5 +154,12 @@ def prueba_ml(request):
         "categoria_top": categoria_top,
         "meses": json.dumps(meses),
         "ventas_mensuales": json.dumps(ventas_mensuales),
-        "mes_prediccion": mes_prediccion
+        "mes_prediccion": mes_prediccion,
+        "mae": mae,
+        "mape": mape,
+        "stock_sugerido": stock_sugerido,
+        "producto_top": producto_top,
+        "promedio_mensual": promedio_mensual,
+        "ventas_producto_mes": ventas_producto_mes,
+        "total_producto_top": total_producto_top,
     })
